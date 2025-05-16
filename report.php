@@ -36,7 +36,6 @@ $user_type=$_SESSION['user_type'];
                             <option value="">All Reports</option>
                             <option value="orders">Order Reports</option>
                             <option value="dispatch">Dispatch Reports</option>
-                            <option value="inventory">Inventory Reports</option>
                         </select>
                     </div>
                     
@@ -64,7 +63,7 @@ $user_type=$_SESSION['user_type'];
                         <input type="date" class="filter-input" id="toDate">
                     </div>
                     
-                    <div class="filter-group">
+                    <!-- <div class="filter-group">
                         <label class="filter-label">Status</label>
                         <select class="filter-select" id="statusFilter">
                             <option value="">All Statuses</option>
@@ -73,7 +72,7 @@ $user_type=$_SESSION['user_type'];
                             <option value="shipped">Shipped</option>
                             <option value="cancelled">Cancelled</option>
                         </select>
-                    </div>
+                    </div> -->
                 </div>
                 
                 <div class="report-actions">
@@ -90,5 +89,28 @@ $user_type=$_SESSION['user_type'];
     <script src="assets/js/script.js">
         
     </script>
+    <script>
+document.getElementById('downloadReport').addEventListener('click', function() {
+    // Get all filter values
+    const reportType = document.getElementById('reportType').value;
+    const dateRange = document.getElementById('dateRange').value;
+    const fromDate = document.getElementById('fromDate').value;
+    const toDate = document.getElementById('toDate').value;
+    //const statusFilter = document.getElementById('statusFilter').value;
+    
+    // Create query string with all filters
+    const queryParams = new URLSearchParams({
+        reportType: reportType,
+        dateRange: dateRange,
+        fromDate: fromDate,
+        toDate: toDate,
+        //status: statusFilter,
+        userType: '<?php echo $user_type; ?>' // Pass current user type
+    });
+    
+    // Trigger download
+    window.location.href = 'config/download_report.php?' + queryParams.toString();
+});
+</script>
 </body>
 </html>
