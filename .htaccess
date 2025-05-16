@@ -1,0 +1,19 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Force HTTPS (optional)
+# RewriteCond %{HTTPS} off
+# RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# EXCLUDE folders like 'config' or specific files from rewrites
+RewriteCond %{REQUEST_URI} ^/config/ [NC]
+RewriteRule ^ - [L]
+
+# Remove .php extension for all others
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME}\.php -f
+RewriteRule ^([^\.]+)$ $1.php [NC,L]
+
+# Redirect .php to extensionless URL (for SEO-friendly URLs)
+RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.php [NC]
+RewriteRule ^ %1 [R=301,L]
