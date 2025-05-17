@@ -24,7 +24,7 @@ $remaining=$totalorder-$completed;
 $totalItems=gettotalitem($conn);
 $dispatchOrders=gettotaldispatch($conn);
 $totalcost=gettotalcost($conn);
-
+$phdata = getAllPhData($conn);
 include "design/header.php"; 
 ?>
     <main class="main-content">
@@ -54,7 +54,7 @@ include "design/header.php";
         </div>
         <section class="categories-section">
 <?php 
-$phdata = getAllPhData($conn);
+
 $phCount = count($phdata);
 foreach($phdata as $data){
     $ph_id = $data['id'];
@@ -83,7 +83,19 @@ foreach($phdata as $data){
     <?php } ?>
 <?php } ?>
 </section>
-<?php } else{?> <div class="container">
+<?php } else{?> 
+    <div class="buttons d-flex justify-content-end align-items-center gap-3 flex-wrap my-4">
+  <button type="button" class="btn btn-primary px-4 py-2 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#exampleModal1">
+    Add Categories
+  </button>
+  <button type="button" class="btn btn-success px-4 py-2 rounded-pill shadow" data-bs-toggle="modal" data-bs-target="#exampleModal2">
+    Add Subcategories
+  </button>
+</div>
+
+    <div class="container">
+    
+   
                 <div class="box box-items">
                     <div class="box-header">Total Items</div>
                     <div class="box-content">
@@ -123,7 +135,77 @@ foreach($phdata as $data){
         <h3 class="chart-title">Monthly Cost Analysis</h3>
         <canvas id="costChart"></canvas>
     </div>
-</div><?php } ?>
+
+</div>
+<?php } ?>
+<div class="modal fade" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Catogaries</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+      <form id="categoryForm">
+  <div class="modal-body">
+    <div class="mb-3">
+      <label for="categoryInput" class="form-label">New Category</label>
+      <input type="text" class="form-control" id="categoryInput" name="category" placeholder="Enter new category name" required>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save changes</button>
+  </div>
+</form>
+
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="exampleModal2" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Sub Catogaries</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="sphForm" enctype="multipart/form-data">
+          <div class="mb-3">
+    <label for="subCategoryInput" class="form-label">Subcategory Name</label>
+    <input type="text" class="form-control" id="subCategoryInput" name="subcategory" placeholder="Enter subcategory name">
+  </div>
+<div class="mb-3">
+    <label for="subCategoryInput" class="form-label">Unit Cost</label>
+    <input type="number" class="form-control" id="subCategoryInput" name="cost" placeholder="Enter Unit Cost">
+  </div>
+  <!-- Select Category -->
+  <div class="mb-3">
+    <label for="categorySelect" class="form-label">Select Existing Category</label>
+    <select class="form-select" id="categorySelect" name="ph_id" required>
+      <option selected disabled>Select a category</option>
+      <?php foreach($phdata as $data){ ?>
+      <option value="<?= $data['id'] ?>"><?= $data['name'] ?></option>
+      <?php } ?>
+    </select>
+  </div>
+
+  <!-- Image Upload -->
+  <div class="mb-3">
+    <label for="imageUpload" class="form-label">Upload Image</label>
+    <input class="form-control" type="file" name="img" id="imageUpload" accept="image/*" required>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+    <button type="submit" class="btn btn-primary">Save changes</button>
+  </div>
+</form>
+
+    </div>
+  </div>
+</div>
     </main>
     <?php include "design/footer.php"; ?>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
@@ -172,7 +254,7 @@ foreach($phdata as $data){
             data: {
                 labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
                 datasets: [{
-                    label: 'Monthly Cost ($)',
+                    label: 'Monthly Cost ()',
                     data: [1200, 1900, 1500, 2000, 1800, 2200],
                     fill: false,
                     borderColor: 'rgb(124, 58, 237)',
@@ -192,5 +274,57 @@ foreach($phdata as $data){
         });
         <?php endif; ?>
     </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $('#sphForm').on('submit', function(e) {
+    e.preventDefault();
+
+    var formData = new FormData(this);
+
+    $.ajax({
+      url: 'config/insert_sph',  // backend PHP file
+      type: 'POST',
+      data: formData,
+      contentType: false,
+      processData: false,
+      success: function(response) {
+        alert(response);
+        $('#sphForm')[0].reset(); // clear form
+      },
+      error: function() {
+        alert('Error occurred while saving data.');
+      }
+    });
+    
+  });
+  $("#categoryForm").submit(function (e) {
+      e.preventDefault();
+
+      var category = $("#categoryInput").val().trim();
+
+      if (category !== "") {
+        $.ajax({
+          url: "config/insert_category",
+          type: "POST",
+          data: { category: category },
+          success: function (response) {
+            alert(response);
+            $("#categoryForm")[0].reset();
+
+            // Close the modal (replace '#yourModalId' with your actual modal ID)
+            var modalElement = document.getElementById('yourModalId');
+            var modalInstance = bootstrap.Modal.getInstance(modalElement);
+            modalInstance.hide();
+          },
+          error: function () {
+            alert("Something went wrong. Try again.");
+          }
+        });
+      } else {
+        alert("Please enter a category name.");
+      }
+    });
+</script>
+
 </body>
 </html>
