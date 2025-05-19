@@ -316,13 +316,6 @@ if (!$user_id || !$user_type) {
             quantityInput.addEventListener('change', updateTotal);
             quantityInput.addEventListener('input', updateTotal);
             
-            // Order button click handler
-            // orderBtn.addEventListener('click', function() {
-            //     const quantity = parseInt(quantityInput.value);
-            //     alert(`Order placed for ${quantity} item(s). Total: ${(numericPrice * quantity).toFixed(2)}`);
-            //     // In a real app, this would submit to your order processing system
-            // });
-            
             function updateTotal() {
                 const quantity = parseInt(quantityInput.value);
                 // Validate quantity
@@ -380,7 +373,6 @@ if (!$user_id || !$user_type) {
   $.ajax({
     url: 'config/addorder',
     type: 'POST',
-    // dataType: 'json', // Expect JSON response
     data: {
       sph_id,
       total_price,
@@ -388,9 +380,9 @@ if (!$user_id || !$user_type) {
     },
     success: function (response) {
       alert(response);
-       // $('#registerForm')[0].reset();
+       
         window.location.href = 'order.php';
-        //console.log("hello");
+        
       
     },
     error: function (xhr) {

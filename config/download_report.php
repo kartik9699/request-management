@@ -124,12 +124,6 @@ if (!empty($dateCondition)) {
     $sql .= $dateCondition;
 }
 
-// Apply status filter (if applicable)
-// if (!empty($status)) {
-//     $sql .= (strpos($sql, 'WHERE') === false ? ' WHERE ' : ' AND ');
-//     $sql .= "o.status = '" . mysqli_real_escape_string($conn, $status) . "'";
-// }
-
 // Execute query
 $result = mysqli_query($conn, $sql);
 
